@@ -7,9 +7,15 @@ export const getPatients = () => {
   return client.get('/patient_basic_info');
 };
 
-export const addPatient = (params: any) => {
-  console.log(params);
-  return client.get('/patient_basic_info');
+export const addPatient = (addParams: {
+  id: string;
+  name: string;
+  name_kana: string;
+  birth_date: string;
+  sex: string;
+}) => {
+  console.log(addParams);
+  return client.post('/add_patient', { data: addParams });
 };
 
 export const editPatient = (searchParams: any, editParams: any) => {
@@ -26,5 +32,5 @@ export const deletePatient = (deleteParams: {
   sex: string;
 }) => {
   console.log('delete Params: ', deleteParams);
-  return client.post('/delete_patient', { data: deleteParams });
+  return client.delete('/delete_patient', { data: deleteParams });
 };

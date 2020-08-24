@@ -57,7 +57,10 @@ const PatientsPage = () => {
         columns={columns}
         data={[patient]}
         editable={{
-          onRowAdd: (rowData) => new Promise(() => {}),
+          onRowAdd: (rowData) =>
+            new Promise(() => {
+              console.log(rowData);
+            }),
           onRowUpdate: (rowData) => new Promise(() => {}),
           onRowDelete: (oldData) =>
             new Promise((resolve, reject) => {
