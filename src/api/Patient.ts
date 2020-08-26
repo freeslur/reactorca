@@ -32,5 +32,5 @@ export const deletePatient = (deleteParams: {
   sex: string;
 }) => {
   console.log('delete Params: ', deleteParams);
-  return client.delete('/delete_patient', { data: deleteParams });
+  return client.post('/delete_patient', { data: deleteParams });
 };
