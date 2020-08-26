@@ -31,11 +31,11 @@ const PatientsPage = () => {
       .getPatients()
       .then((resp) => {
         const data: IPatient = {
-          id: resp.data.Patient_ID['#text'],
-          name: resp.data.WholeName['#text'],
-          name_kana: resp.data.WholeName_inKana['#text'],
-          birth_date: resp.data.BirthDate['#text'],
-          sex: resp.data.Sex['#text'],
+          id: resp.data.Patient_ID,
+          name: resp.data.WholeName,
+          name_kana: resp.data.WholeName_inKana,
+          birth_date: resp.data.BirthDate,
+          sex: resp.data.Sex,
         };
         setPatient(data);
       })
