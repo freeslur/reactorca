@@ -8,11 +8,11 @@ export const getPatients = () => {
 };
 
 export const addPatient = (addParams: {
-  id: string;
-  name: string;
-  name_kana: string;
-  birth_date: string;
-  sex: string;
+  Patient_ID: string;
+  WholeName: string;
+  WholeName_inKana: string;
+  BirthDate: string;
+  Sex: string;
 }) => {
   console.log(addParams);
   return client.post('/add_patient', { data: addParams });
@@ -25,11 +25,11 @@ export const editPatient = (searchParams: any, editParams: any) => {
 };
 
 export const deletePatient = (deleteParams: {
-  id: string;
-  name: string;
-  name_kana: string;
-  birth_date: string;
-  sex: string;
+  Patient_ID: string;
+  WholeName: string;
+  WholeName_inKana: string;
+  BirthDate: string;
+  Sex: string;
 }) => {
   console.log('delete Params: ', deleteParams);
   return client.post('/delete_patient', { data: deleteParams });
