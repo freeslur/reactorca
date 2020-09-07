@@ -6,78 +6,177 @@ import {
   TableBody,
   Table,
   TableCell,
-  createStyles,
-  makeStyles,
-  Theme,
-  lighten,
   Toolbar,
   Typography,
   Tooltip,
   IconButton,
+  TableHead,
+  Checkbox,
+  TableSortLabel,
+  TablePagination,
+  useTheme,
 } from '@material-ui/core';
+import clsx from 'clsx';
 import DeleteIcon from '@material-ui/icons/Delete';
+import FilterListIcon from '@material-ui/icons/FilterList';
+import FirstPageIcon from '@material-ui/icons/FirstPage';
+import LastPageIcon from '@material-ui/icons/LastPage';
+import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '100%',
-    },
-    paper: {
-      width: '100%',
-      marginBottom: theme.spacing(2),
-    },
-    table: {
-      minWidth: 750,
-    },
-    visuallyHidden: {},
-  })
-);
+import { AcceptanceData as rows, headCells } from './AcceptanceData';
+import {
+  Order,
+  AcceptanceListProps,
+  IPatient,
+  AcceptanceListToolbarProps,
+} from './AcceptanceDataInterfaces';
+import {
+  StyledTableCell,
+  useToolbarStyles,
+  useTablePaginationStyles,
+  useDefaultListStyles,
+  StyledTableRow,
+} from './AcceptanceListStyles';
+import { TablePaginationActionsProps } from '@material-ui/core/TablePagination/TablePaginationActions';
+import { StatusSelect } from './AcceptanceComponents';
 
-interface IPatient {
-  Patient_ID: string;
-  WholeName: string;
-  WholeName_inKana: string;
-  BirthDate: string;
-  Sex: string;
+function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
 }
 
-function createData(
-  Patient_ID: string,
-  WholeName: string,
-  WholeName_inKana: string,
-  BirthDate: string,
-  Sex: string
-): IPatient {
-  return { Patient_ID, WholeName, WholeName_inKana, BirthDate, Sex };
+function getComparator<Key extends keyof any>(
+  order: Order,
+  orderBy: Key
+): (
+  a: { [key in Key]: number | string },
+  b: { [key in Key]: number | string }
+) => number {
+  return order === 'desc'
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-const rows = [
-  createData('Cupcake', '305', '3.7', '67', '4.3'),
-  createData('Donut', '452', '25.0', '51', '4.9'),
-  createData('Eclair', '262', '16.0', '24', '6.0'),
-  createData('Frozen yoghurt', '159', '6.0', '24', '4.0'),
-  createData('Gingerbread', '356', '16.0', '49', '3.9'),
-  createData('Honeycomb', '408', '3.2', '87', '6.5'),
-  createData('Ice cream sandwich', '237', '9.0', '37', '4.3'),
-  createData('Jelly Bean', '375', '0.0', '94', '0.0'),
-  createData('KitKat', '518', '26.0', '65', '7.0'),
-  createData('Lollipop', '392', '0.2', '98', '0.0'),
-  createData('Marshmallow', '318', '0', '81', '2.0'),
-  createData('Nougat', '360', '19.0', '9', '37.0'),
-  createData('Oreo', '437', '18.0', '63', '4.0'),
-];
-
-type Order = 'asc' | 'desc';
-
-interface AcceptanceListProps {
-  classes: ReturnType<typeof useStyles>;
-  numSelected: number;
-  onRequestSort: (event: MouseEvent<unknown>, property: keyof IPatient) => void;
-  onSelectAllClick: (event: ChangeEvent<HTMLInputElement>) => void;
-  order: Order;
-  orderBy: string;
-  rowCount: number;
+function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
+  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) return order;
+    return a[1] - b[1];
+  });
+  return stabilizedThis.map((el) => el[0]);
 }
+
+const AcceptanceListToolbar = (props: AcceptanceListToolbarProps) => {
+  const classes = useToolbarStyles();
+  const { numSelected } = props;
+  return (
+    <Toolbar
+      className={clsx(classes.root, { [classes.highlight]: numSelected > 0 })}
+    >
+      {numSelected > 0 ? (
+        <Typography
+          className={classes.title}
+          color='inherit'
+          variant='subtitle1'
+          component='div'
+        >
+          {numSelected}個選択
+        </Typography>
+      ) : (
+        <Typography
+          className={classes.title}
+          variant='h6'
+          id='tableTitle'
+          component='div'
+        >
+          受付リスト
+        </Typography>
+      )}
+      {numSelected > 0 ? (
+        <Tooltip title='Delete'>
+          <IconButton aria-label='delete'>
+            <DeleteIcon />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        <Tooltip title='Filter list'>
+          <IconButton aria-label='filter list'>
+            <FilterListIcon />
+          </IconButton>
+        </Tooltip>
+      )}
+    </Toolbar>
+  );
+};
+
+const TablePaginationActions = (props: TablePaginationActionsProps) => {
+  const classes = useTablePaginationStyles();
+  const theme = useTheme();
+  const { count, page, rowsPerPage, onChangePage } = props;
+
+  const handleFirstPageButtonClick = (event: MouseEvent<HTMLButtonElement>) => {
+    onChangePage(event, 0);
+  };
+  const handlePreviousPageButtonClick = (
+    event: MouseEvent<HTMLButtonElement>
+  ) => {
+    onChangePage(event, page - 1);
+  };
+  const handleNextPageButtonClick = (event: MouseEvent<HTMLButtonElement>) => {
+    onChangePage(event, page + 1);
+  };
+  const handleLastPageButtonClick = (event: MouseEvent<HTMLButtonElement>) => {
+    onChangePage(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+  };
+
+  return (
+    <div className={classes.root}>
+      <IconButton
+        disabled={page === 0}
+        aria-label='first page'
+        onClick={handleFirstPageButtonClick}
+      >
+        {theme.direction === 'rtl' ? <LastPageIcon /> : <FirstPageIcon />}
+      </IconButton>
+      <IconButton
+        disabled={page === 0}
+        aria-label='previous page'
+        onClick={handlePreviousPageButtonClick}
+      >
+        {theme.direction === 'rtl' ? (
+          <KeyboardArrowRightIcon />
+        ) : (
+          <KeyboardArrowLeftIcon />
+        )}
+      </IconButton>
+      <IconButton
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label='next page'
+        onClick={handleNextPageButtonClick}
+      >
+        {theme.direction === 'rtl' ? (
+          <KeyboardArrowLeftIcon />
+        ) : (
+          <KeyboardArrowRightIcon />
+        )}
+      </IconButton>
+      <IconButton
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label='last page'
+        onClick={handleLastPageButtonClick}
+      >
+        {theme.direction === 'rtl' ? <FirstPageIcon /> : <LastPageIcon />}
+      </IconButton>
+    </div>
+  );
+};
 
 const AcceptanceListHead = (props: AcceptanceListProps) => {
   const {
@@ -90,65 +189,75 @@ const AcceptanceListHead = (props: AcceptanceListProps) => {
     onRequestSort,
   } = props;
   const createSortHandler = (property: keyof IPatient) => (
-    event: React.MouseEvent<unknown>
+    event: MouseEvent<unknown>
   ) => {
     onRequestSort(event, property);
   };
-  return <></>;
-};
-
-const useToolbarStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      paddingLeft: theme.spacing(2),
-      paddingRight: theme.spacing(1),
-    },
-    highlight:
-      theme.palette.type === 'light'
-        ? {
-            color: theme.palette.secondary.main,
-            backgroundColor: lighten(theme.palette.secondary.light, 0.85),
-          }
-        : {
-            color: theme.palette.text.primary,
-            backgroundColor: theme.palette.secondary.dark,
-          },
-    title: {
-      flex: '1 1 100%',
-    },
-  })
-);
-
-interface AcceptanceListToolbarProps {
-  numSelected: number;
-}
-
-const AcceptanceListToolbar = (props: AcceptanceListToolbarProps) => {
-  const classes = useToolbarStyles();
-  const { numSelected } = props;
   return (
-    <Toolbar>
-      <Typography>受付リスト</Typography>
-      <Tooltip title='Delete'>
-        <IconButton>
-          <DeleteIcon />
-        </IconButton>
-      </Tooltip>
-    </Toolbar>
+    <TableHead>
+      <TableRow>
+        <StyledTableCell
+          padding='checkbox'
+          style={{ borderLeft: '1px solid gray', borderTop: '1px solid gray' }}
+        >
+          <Checkbox
+            indeterminate={numSelected > 0 && numSelected < rowCount}
+            checked={rowCount > 0 && numSelected === rowCount}
+            onChange={onSelectAllClick}
+            inputProps={{ 'aria-label': 'select all desserts' }}
+          />
+        </StyledTableCell>
+        {headCells.map((headCell) => (
+          <StyledTableCell
+            key={headCell.id}
+            align='center'
+            padding='none'
+            sortDirection={orderBy === headCell.id ? order : false}
+            style={{
+              borderLeft: '1px solid gray',
+              borderTop: '1px solid gray',
+            }}
+          >
+            <TableSortLabel
+              active={orderBy === headCell.id}
+              direction={orderBy === headCell.id ? order : 'asc'}
+              onClick={createSortHandler(headCell.id)}
+            >
+              {headCell.label}
+              {orderBy === headCell.id ? (
+                <span className={classes.visuallyHidden}>
+                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                </span>
+              ) : null}
+            </TableSortLabel>
+          </StyledTableCell>
+        ))}
+        <StyledTableCell
+          style={{
+            borderLeft: '1px solid gray',
+            borderTop: '1px solid gray',
+            borderRight: '1px solid gray',
+          }}
+        >
+          会計
+        </StyledTableCell>
+      </TableRow>
+    </TableHead>
   );
 };
 
 const AcceptanceList = () => {
-  const classes = useStyles();
+  const classes = useDefaultListStyles();
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof IPatient>('Patient_ID');
+  const [orderBy, setOrderBy] = useState<keyof IPatient>('Acceptance_ID');
   const [selected, setSelected] = useState<string[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [status, setStatus] = useState('0');
 
   const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelecteds = rows.map((n) => n.Patient_ID);
+      const newSelecteds = rows.map((n) => n.Acceptance_ID);
       setSelected(newSelecteds);
       return;
     }
@@ -163,12 +272,55 @@ const AcceptanceList = () => {
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(property);
   };
+
+  const handleClick = (event: MouseEvent<unknown>, acceptance_id: string) => {
+    const selectedIndex = selected.indexOf(acceptance_id);
+    let newSelected: string[] = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, acceptance_id);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+    setSelected(newSelected);
+  };
+
+  const handleChangePage = (
+    event: MouseEvent<HTMLButtonElement> | null,
+    newPage: number
+  ) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const isSelected = (name: string) => selected.indexOf(name) !== -1;
+  const emptyRows =
+    rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
         <AcceptanceListToolbar numSelected={selected.length} />
-        <TableContainer>
-          <Table className={classes.table} size='small' aria-label='受付リスト'>
+        <TableContainer className={classes.container}>
+          <Table
+            stickyHeader
+            className={classes.table}
+            size='medium'
+            aria-label='受付リスト'
+          >
             <AcceptanceListHead
               classes={classes}
               numSelected={selected.length}
@@ -179,20 +331,155 @@ const AcceptanceList = () => {
               rowCount={rows.length}
             />
             <TableBody>
-              {rows.map((row) => (
-                <TableRow key={row.Patient_ID}>
-                  <TableCell component='th' scope='row'>
-                    {row.Patient_ID}
-                  </TableCell>
-                  <TableCell>{row.WholeName}</TableCell>
-                  <TableCell>{row.WholeName_inKana}</TableCell>
-                  <TableCell>{row.BirthDate}</TableCell>
-                  <TableCell>{row.Sex}</TableCell>
+              {stableSort(rows, getComparator(order, orderBy))
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row, index) => {
+                  const isItemsSelected = isSelected(row.Acceptance_ID);
+                  const labelId = `enhanced-table-checkbox-${index}`;
+
+                  return (
+                    <StyledTableRow
+                      hover
+                      role='checkbox'
+                      aria-checked={isItemsSelected}
+                      tabIndex={-1}
+                      key={row.Acceptance_ID}
+                      selected={isItemsSelected}
+                      onClick={(event) => handleClick(event, row.Acceptance_ID)}
+                    >
+                      <TableCell
+                        padding='checkbox'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        <Checkbox
+                          checked={isItemsSelected}
+                          inputProps={{ 'aria-labelledby': labelId }}
+                        />
+                      </TableCell>
+                      <TableCell
+                        component='th'
+                        id={labelId}
+                        scope='row'
+                        padding='none'
+                        align='center'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        {row.Acceptance_ID}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        {row.Acceptance_Time}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        <StatusSelect statusCode={parseInt(row.Status)} />
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        {row.Patient_ID}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        {row.WholeName_inKana}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        {row.WholeName}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        {row.BirthDate}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        {row.Sex}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        {row.InsuranceProvider_WholeName}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        {row.Department_WholeName}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        {row.Physician_WholeName}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        {row.Previouse_Acceptance_Date}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        {row.Patient_Memo}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        style={{ borderLeft: '1px solid gray' }}
+                      >
+                        {row.Acceptance_Memo}
+                      </TableCell>
+                      <TableCell
+                        align='center'
+                        style={{
+                          borderLeft: '1px solid gray',
+                          borderRight: '1px solid gray',
+                        }}
+                      >
+                        ￥
+                      </TableCell>
+                    </StyledTableRow>
+                  );
+                })}
+              {emptyRows > 0 && (
+                <TableRow style={{ height: 53 * emptyRows }}>
+                  <TableCell
+                    colSpan={6}
+                    style={{ borderLeft: '1px solid gray' }}
+                  />
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, { label: 'すべて', value: -1 }]}
+          count={rows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onChangePage={handleChangePage}
+          onChangeRowsPerPage={handleChangeRowsPerPage}
+          SelectProps={{
+            inputProps: { 'aria-label': 'rows per page' },
+            native: true,
+          }}
+          ActionsComponent={TablePaginationActions}
+        />
       </Paper>
     </div>
   );
