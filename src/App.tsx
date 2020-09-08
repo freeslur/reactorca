@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 // import PatientsPage from './list/PatientPage';
 import AcceptanceList from './list/AcceptanceList';
+import { AcceptanceStatusContextProvider } from './contexts/AcceptanceStatusContext';
 
 class App extends Component {
   render() {
     return (
       <>
-        <div>
+        <AcceptanceStatusContextProvider>
           {/* <PatientsPage
           // patients={this.props.patients}
           // onAddPatient={this.onAddPatient}
@@ -14,7 +15,7 @@ class App extends Component {
           // isLoading={this.props.isLoading}
           /> */}
           <AcceptanceList />
-        </div>
+        </AcceptanceStatusContextProvider>
       </>
     );
   }

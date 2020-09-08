@@ -1,7 +1,6 @@
 import { IPatient, HeadCell } from './AcceptanceDataInterfaces';
 
 export const Status = [
-  { title: 'チェック', color: 'gray', textColor: 'black' },
   { title: '診療待', color: 'DEEPSKYBLUE', textColor: 'black' },
   { title: '送信待', color: 'VIOLET', textColor: 'black' },
   { title: '送信済', color: 'LIME', textColor: 'black' },
@@ -67,7 +66,7 @@ export const AcceptanceData = [
   createData(
     '001',
     '305',
-    '1',
+    '0',
     '67',
     '4.3',
     'Cupcake',
@@ -83,7 +82,7 @@ export const AcceptanceData = [
   createData(
     '002',
     '452',
-    '1',
+    '0',
     '51',
     '4.9',
     'Donut',
@@ -99,7 +98,7 @@ export const AcceptanceData = [
   createData(
     '003',
     '262',
-    '2',
+    '1',
     '24',
     '6.0',
     'Eclair',
@@ -115,7 +114,7 @@ export const AcceptanceData = [
   createData(
     '004',
     '159',
-    '1',
+    '0',
     '24',
     '4.0',
     'Frozen yoghurt',
@@ -131,7 +130,7 @@ export const AcceptanceData = [
   createData(
     '005',
     '356',
-    '3',
+    '2',
     '49',
     '3.9',
     'Gingerbread',
@@ -147,7 +146,7 @@ export const AcceptanceData = [
   createData(
     '006',
     '408',
-    '1',
+    '0',
     '87',
     '6.5',
     'Honeycomb',
@@ -163,7 +162,7 @@ export const AcceptanceData = [
   createData(
     '007',
     '237',
-    '1',
+    '0',
     '37',
     '4.3',
     'Ice cream sandwich',
@@ -179,7 +178,7 @@ export const AcceptanceData = [
   createData(
     '008',
     '375',
-    '3',
+    '2',
     '94',
     '0.0',
     'Jelly Bean',
@@ -195,7 +194,7 @@ export const AcceptanceData = [
   createData(
     '009',
     '518',
-    '3',
+    '2',
     '65',
     '7.0',
     'KitKat',
@@ -211,7 +210,7 @@ export const AcceptanceData = [
   createData(
     '010',
     '392',
-    '3',
+    '2',
     '98',
     '0.0',
     'Lollipop',
@@ -227,7 +226,7 @@ export const AcceptanceData = [
   createData(
     '011',
     '318',
-    '1',
+    '0',
     '81',
     '2.0',
     'Marshmallow',
@@ -243,7 +242,7 @@ export const AcceptanceData = [
   createData(
     '012',
     '360',
-    '2',
+    '1',
     '9',
     '37.0',
     'Nougat',
@@ -259,7 +258,7 @@ export const AcceptanceData = [
   createData(
     '013',
     '437',
-    '1',
+    '0',
     '63',
     '4.0',
     'Oreo',

@@ -38,15 +38,14 @@ interface IStatusSelect {
 }
 
 export const StatusSelect = (props: IStatusSelect) => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [buttonTitle, setButtonTitle] = useState(Status[1].title);
-  const [buttonColor, setButtonColor] = useState('DEEPSKYBLUE');
   const { statusCode } = props;
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [buttonTitle, setButtonTitle] = useState(Status[statusCode].title);
+  const [buttonColor, setButtonColor] = useState(Status[statusCode].color);
   const handleClick = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
     event.stopPropagation();
   };
-  const statusData = Status[statusCode];
 
   const handleClickItem = (event: MouseEvent<HTMLElement>, index: number) => {
     setButtonTitle(Status[index].title);
@@ -65,7 +64,7 @@ export const StatusSelect = (props: IStatusSelect) => {
         aria-controls='status-select'
         aria-haspopup='true'
         variant='contained'
-        style={{ backgroundColor: buttonColor }}
+        style={{ backgroundColor: buttonColor, width: '100px' }}
         onClick={handleClick}
       >
         {buttonTitle}▼

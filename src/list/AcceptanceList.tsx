@@ -23,6 +23,7 @@ import FirstPageIcon from '@material-ui/icons/FirstPage';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
+import CreditCardIcon from '@material-ui/icons/CreditCard';
 
 import { AcceptanceData as rows, headCells } from './AcceptanceData';
 import {
@@ -40,6 +41,10 @@ import {
 } from './AcceptanceListStyles';
 import { TablePaginationActionsProps } from '@material-ui/core/TablePagination/TablePaginationActions';
 import { StatusSelect } from './AcceptanceComponents';
+import {
+  useAcceptanceStatusState,
+  useAcceptanceStatusDispatch,
+} from '../contexts/AcceptanceStatusContext';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -253,7 +258,8 @@ const AcceptanceList = () => {
   const [selected, setSelected] = useState<string[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [status, setStatus] = useState('0');
+  const rowStatus = useAcceptanceStatusState();
+  const rowStatusDispatch = useAcceptanceStatusDispatch();
 
   const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -451,7 +457,12 @@ const AcceptanceList = () => {
                           borderRight: '1px solid gray',
                         }}
                       >
-                        ￥
+                        <IconButton
+                          color='secondary'
+                          // disabled={rowStatus[index].code !== 1}
+                        >
+                          <CreditCardIcon />
+                        </IconButton>
                       </TableCell>
                     </StyledTableRow>
                   );
