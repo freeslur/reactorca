@@ -36,7 +36,7 @@ export const useDefaultListStyles = makeStyles((theme: Theme) =>
       width: '100%',
     },
     container: {
-      maxHeight: 320,
+      maxHeight: 500,
     },
     paper: {
       width: '100%',

@@ -46,7 +46,6 @@ export const StatusSelect = (props: IStatusSelect) => {
     setAnchorEl(event.currentTarget);
     event.stopPropagation();
   };
-
   const handleClickItem = (event: MouseEvent<HTMLElement>, index: number) => {
     setButtonTitle(Status[index].title);
     setButtonColor(Status[index].color);
@@ -78,6 +77,7 @@ export const StatusSelect = (props: IStatusSelect) => {
       >
         {Status.map((status, index) => (
           <StyledSelectItem
+            key={index}
             onClick={(event) => handleClickItem(event, index)}
             style={{ backgroundColor: status.color }}
           >

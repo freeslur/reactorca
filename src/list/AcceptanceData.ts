@@ -1,4 +1,4 @@
-import { IPatient, HeadCell } from './AcceptanceDataInterfaces';
+import { IPatient, IHeadCell } from './AcceptanceDataInterfaces';
 
 export const Status = [
   { title: '診療待', color: 'DEEPSKYBLUE', textColor: 'black' },
@@ -9,13 +9,13 @@ export const Status = [
 
 function createData(
   Acceptance_ID: string,
-  Patient_ID: string,
+  Acceptance_Time: string,
   Status: string,
-  WholeName: string,
+  Patient_ID: string,
   WholeName_inKana: string,
+  WholeName: string,
   BirthDate: string,
   Sex: string,
-  Acceptance_Time: string,
   InsuranceProvider_WholeName: string,
   Department_WholeName: string,
   Physician_WholeName: string,
@@ -25,13 +25,13 @@ function createData(
 ): IPatient {
   return {
     Acceptance_ID,
-    Patient_ID,
+    Acceptance_Time,
     Status,
-    WholeName,
+    Patient_ID,
     WholeName_inKana,
+    WholeName,
     BirthDate,
     Sex,
-    Acceptance_Time,
     InsuranceProvider_WholeName,
     Department_WholeName,
     Physician_WholeName,
@@ -41,7 +41,7 @@ function createData(
   };
 }
 
-export const headCells: HeadCell[] = [
+export const headCells: IHeadCell[] = [
   { id: 'Acceptance_ID', disablePadding: true, label: '番号' },
   { id: 'Acceptance_Time', disablePadding: true, label: '時間' },
   { id: 'Status', disablePadding: true, label: 'ステータス' },

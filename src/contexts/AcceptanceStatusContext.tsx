@@ -6,16 +6,26 @@ import React, {
   useContext,
 } from 'react';
 
-export type AcceptanceStatus = { acceptance_id: number; code: number };
-type AcceptanceStatusState = AcceptanceStatus[];
+export type AcceptanceStatusState = {
+  index?: number;
+  acceptance_id?: string;
+  code?: number;
+};
+
+type Action = {
+  type: 'SET_STATUS';
+  index: number;
+  acceptance_id: string;
+  code: number;
+};
+type AcceptanceStatusDispatch = Dispatch<Action>;
+
+// type AcceptanceStatusState = AcceptanceStatus[];
+
 const AcceptanceStatusContext = createContext<
   AcceptanceStatusState | undefined
 >(undefined);
 
-type Action =
-  | { type: 'SELECT'; acceptance_id: number; code: number }
-  | { type: 'ADD'; data: AcceptanceStatusState };
-type AcceptanceStatusDispatch = Dispatch<Action>;
 const AcceptanceStatusDispatchContext = createContext<
   AcceptanceStatusDispatch | undefined
 >(undefined);
@@ -25,18 +35,13 @@ const AcceptanceStatusReducer = (
   action: Action
 ) => {
   switch (action.type) {
-    case 'ADD': {
-      return (state = action.data);
-    }
-    case 'SELECT': {
-      return state.map((status) =>
-        status.acceptance_id === action.acceptance_id
-          ? {
-              ...status,
-              code: action.code,
-            }
-          : status
-      );
+    case 'SET_STATUS': {
+      console.log(action.acceptance_id);
+      return {
+        index: action.index,
+        acceptance_id: action.acceptance_id,
+        code: action.code,
+      };
     }
     default:
       throw new Error('unhandled action');
@@ -48,7 +53,11 @@ export const AcceptanceStatusContextProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const [acceptanceStatus, dispatch] = useReducer(AcceptanceStatusReducer, []);
+  const [acceptanceStatus, dispatch] = useReducer(AcceptanceStatusReducer, {
+    index: -1,
+    acceptance_id: '',
+    code: 0,
+  });
   return (
     <AcceptanceStatusDispatchContext.Provider value={dispatch}>
       <AcceptanceStatusContext.Provider value={acceptanceStatus}>

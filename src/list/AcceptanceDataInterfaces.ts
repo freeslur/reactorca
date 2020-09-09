@@ -20,13 +20,13 @@ export interface IPatient {
   Acceptance_Memo: string;
 }
 
-export interface HeadCell {
+export interface IHeadCell {
   disablePadding: boolean;
   id: keyof IPatient;
   label: string;
 }
 
-export interface AcceptanceListProps {
+export interface IAcceptanceListProps {
   classes: ReturnType<typeof useDefaultListStyles>;
   numSelected: number;
   onRequestSort: (event: MouseEvent<unknown>, property: keyof IPatient) => void;
@@ -36,9 +36,15 @@ export interface AcceptanceListProps {
   rowCount: number;
 }
 
-export interface AcceptanceListToolbarProps {
+export interface IAcceptanceListToolbarProps {
   numSelected: number;
 }
+
+export type AcceptanceStatusState = {
+  index?: number;
+  acceptance_id?: string;
+  code?: number;
+};
 
 interface TablePaginationActionsProps {
   count: number;
