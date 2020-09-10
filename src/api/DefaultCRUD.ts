@@ -1,6 +1,7 @@
 import axiosBase from 'axios';
 
-export const server_url = 'http://192.168.8.94:5000/api';
+export const server_url = 'http://127.0.0.1:5000/api';
+// export const server_url = 'http://192.168.8.122:5000/api';
 
 export const axios_base = () => {
   return axiosBase.create({

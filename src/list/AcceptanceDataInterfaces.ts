@@ -3,7 +3,7 @@ import { useDefaultListStyles } from './AcceptanceListStyles';
 
 export type Order = 'asc' | 'desc';
 
-export interface IPatient {
+export interface IAcceptance {
   Acceptance_ID: string;
   Patient_ID: string;
   WholeName: string;
@@ -22,14 +22,17 @@ export interface IPatient {
 
 export interface IHeadCell {
   disablePadding: boolean;
-  id: keyof IPatient;
+  id: keyof IAcceptance;
   label: string;
 }
 
 export interface IAcceptanceListProps {
   classes: ReturnType<typeof useDefaultListStyles>;
   numSelected: number;
-  onRequestSort: (event: MouseEvent<unknown>, property: keyof IPatient) => void;
+  onRequestSort: (
+    event: MouseEvent<unknown>,
+    property: keyof IAcceptance
+  ) => void;
   onSelectAllClick: (event: ChangeEvent<HTMLInputElement>) => void;
   order: Order;
   orderBy: string;
@@ -37,6 +40,7 @@ export interface IAcceptanceListProps {
 }
 
 export interface IAcceptanceListToolbarProps {
+  onClickRefresh: () => void;
   numSelected: number;
 }
 

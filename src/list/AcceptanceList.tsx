@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, MouseEvent } from 'react';
+import React, { useState, ChangeEvent, MouseEvent, useEffect } from 'react';
 import {
   TableContainer,
   Paper,
@@ -34,7 +34,7 @@ import { AcceptanceData as rowData, headCells, Status } from './AcceptanceData';
 import {
   Order,
   IAcceptanceListProps,
-  IPatient,
+  IAcceptance,
   IAcceptanceListToolbarProps,
 } from './AcceptanceDataInterfaces';
 import {
@@ -45,10 +45,11 @@ import {
   StyledTableRow,
 } from './AcceptanceListStyles';
 import { TablePaginationActionsProps } from '@material-ui/core/TablePagination/TablePaginationActions';
+import * as api from '../api/Acceptance';
 
 const AcceptanceListToolbar = (props: IAcceptanceListToolbarProps) => {
   const classes = useToolbarStyles();
-  const { numSelected } = props;
+  const { onClickRefresh, numSelected } = props;
 
   /* TODO: 受付削除時のアクション */
   const deleteAcceptances = () => {
@@ -58,8 +59,7 @@ const AcceptanceListToolbar = (props: IAcceptanceListToolbarProps) => {
 
   /* TODO: 受付更新時のアクション */
   const refreshAcceptances = () => {
-    console.log('Refresh!!!!!');
-    alert('Refresh!!');
+    onClickRefresh();
   };
 
   return (
@@ -174,7 +174,7 @@ const AcceptanceListHead = (props: IAcceptanceListProps) => {
     rowCount,
     onRequestSort,
   } = props;
-  const createSortHandler = (property: keyof IPatient) => (
+  const createSortHandler = (property: keyof IAcceptance) => (
     event: MouseEvent<unknown>
   ) => {
     onRequestSort(event, property);
@@ -273,7 +273,7 @@ const AcceptanceList = () => {
   const classes = useDefaultListStyles();
   const [tableData, setTableData] = useState(rowData);
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof IPatient>('Acceptance_ID');
+  const [orderBy, setOrderBy] = useState<keyof IAcceptance>('Acceptance_ID');
   const [selected, setSelected] = useState<string[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -297,7 +297,7 @@ const AcceptanceList = () => {
 
   const handleRequestSort = (
     event: MouseEvent<unknown>,
-    property: keyof IPatient
+    property: keyof IAcceptance
   ) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -401,10 +401,29 @@ const AcceptanceList = () => {
     event.stopPropagation();
   };
 
+  const getAcceptancesData = () => {
+    api
+      .getAcceptances()
+      .then((resp) => {
+        const data: IAcceptance[] = resp.data;
+        setTableData(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    getAcceptancesData();
+  }, []);
+
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <AcceptanceListToolbar numSelected={selected.length} />
+        <AcceptanceListToolbar
+          onClickRefresh={getAcceptancesData}
+          numSelected={selected.length}
+        />
         <TableContainer className={classes.container}>
           <Table
             stickyHeader
@@ -412,7 +431,6 @@ const AcceptanceList = () => {
             size='medium'
             aria-label='受付リスト'
           >
-            {console.log(selected.length, tableData.length)}
             <AcceptanceListHead
               classes={classes}
               numSelected={selected.length}
@@ -426,7 +444,7 @@ const AcceptanceList = () => {
               {sortedData.map((row, rowIndex) => {
                 const isItemsSelected = isSelected(row.Acceptance_ID);
                 const labelId = `enhanced-table-checkbox-${rowIndex}`;
-
+                console.log(row);
                 return (
                   <StyledTableRow
                     hover
@@ -455,7 +473,9 @@ const AcceptanceList = () => {
                       align='center'
                       style={{ borderLeft: '1px solid gray' }}
                     >
-                      {row.Acceptance_ID}
+                      {row.Acceptance_ID === ''
+                        ? ''
+                        : parseInt(row.Acceptance_ID)}
                     </TableCell>
                     <TableCell
                       align='center'
