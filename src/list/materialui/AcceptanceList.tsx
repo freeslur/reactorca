@@ -45,7 +45,7 @@ import {
   StyledTableRow,
 } from './AcceptanceListStyles';
 import { TablePaginationActionsProps } from '@material-ui/core/TablePagination/TablePaginationActions';
-import * as api from '../api/Acceptance';
+import * as api from '../../api/Acceptance';
 
 const AcceptanceListToolbar = (props: IAcceptanceListToolbarProps) => {
   const classes = useToolbarStyles();

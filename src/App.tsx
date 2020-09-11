@@ -1,21 +1,18 @@
 import React, { Component } from 'react';
 // import PatientsPage from './list/PatientPage';
-import AcceptanceList from './list/AcceptanceList';
-import { AcceptanceStatusContextProvider } from './contexts/AcceptanceStatusContext';
+import AcceptanceList from './list/antd/AcceptanceList';
 
 class App extends Component {
   render() {
     return (
       <>
-        <AcceptanceStatusContextProvider>
-          {/* <PatientsPage
+        {/* <PatientsPage
           // patients={this.props.patients}
           // onAddPatient={this.onAddPatient}
           // onStatusChange={this.onStatusChange}
           // isLoading={this.props.isLoading}
           /> */}
-          <AcceptanceList />
-        </AcceptanceStatusContextProvider>
+        <AcceptanceList />
       </>
     );
   }
