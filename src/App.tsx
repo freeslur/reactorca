@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 // import PatientsPage from './list/PatientPage';
-import AcceptanceList from './list/antd/AcceptanceList';
+import AcceptanceList from './list/materialui/AcceptanceList';
 
 class App extends Component {
   render() {
