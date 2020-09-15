@@ -405,6 +405,7 @@ const AcceptanceList = () => {
     api
       .getAcceptances()
       .then((resp) => {
+        console.log(resp);
         const data: IAcceptance[] = resp.data;
         setTableData(data);
       })

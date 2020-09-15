@@ -384,14 +384,20 @@ const AcceptanceList = () => {
   // };
 
   const getAcceptancesData = () => {
+    console.log('??????????????????????');
     api
       .getAcceptances()
       .then((resp) => {
+        console.log('=============================');
+        console.log(resp);
+        console.log('=============================');
         const data: IAcceptance[] = resp.data;
         setTableData(data);
       })
       .catch((err) => {
+        console.log('===========error=============');
         console.log(err);
+        console.log('===========error=============');
       });
   };
 

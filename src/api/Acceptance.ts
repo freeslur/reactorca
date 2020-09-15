@@ -4,7 +4,7 @@ import { axios_base } from '../api/DefaultCRUD';
 const client = axios_base();
 
 export const getAcceptances = () => {
-  return client.get('/acceptance_list');
+  return client.get('/acceptances');
 };
 
 export const addAcceptance = (addParams: {
