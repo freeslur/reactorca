@@ -19,7 +19,7 @@ function createData(
   InsuranceProvider_WholeName: string,
   Department_WholeName: string,
   Physician_WholeName: string,
-  Previouse_Acceptance_Date: string,
+  LastVisit_Date: string,
   Patient_Memo: string,
   Acceptance_Memo: string
 ): IAcceptance {
@@ -35,7 +35,7 @@ function createData(
     InsuranceProvider_WholeName,
     Department_WholeName,
     Physician_WholeName,
-    Previouse_Acceptance_Date,
+    LastVisit_Date,
     Patient_Memo,
     Acceptance_Memo,
   };
@@ -54,7 +54,7 @@ export const headCells: IHeadCell[] = [
   { id: 'Department_WholeName', disablePadding: true, label: '診療科' },
   { id: 'Physician_WholeName', disablePadding: true, label: '医師' },
   {
-    id: 'Previouse_Acceptance_Date',
+    id: 'LastVisit_Date',
     disablePadding: true,
     label: '前回受付日',
   },

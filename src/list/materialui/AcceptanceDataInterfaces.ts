@@ -15,7 +15,7 @@ export interface IAcceptance {
   InsuranceProvider_WholeName: string;
   Department_WholeName: string;
   Physician_WholeName: string;
-  Previouse_Acceptance_Date: string;
+  LastVisit_Date: string;
   Patient_Memo: string;
   Acceptance_Memo: string;
 }
@@ -40,7 +40,8 @@ export interface IAcceptanceListProps {
 }
 
 export interface IAcceptanceListToolbarProps {
-  onClickRefresh: () => void;
+  onClickRefresh: (date: Date | null) => void;
+  date: Date | null;
   numSelected: number;
 }
 

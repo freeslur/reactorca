@@ -21,6 +21,11 @@ import {
   Button,
   MenuProps,
 } from '@material-ui/core';
+
+import 'date-fns';
+import jaLocale from 'date-fns/locale/ja';
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
 import clsx from 'clsx';
 import DeleteIcon from '@material-ui/icons/Delete';
 import RefreshIcon from '@material-ui/icons/Refresh';
@@ -46,10 +51,11 @@ import {
 } from './AcceptanceListStyles';
 import { TablePaginationActionsProps } from '@material-ui/core/TablePagination/TablePaginationActions';
 import * as api from '../../api/Acceptance';
+import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 
 const AcceptanceListToolbar = (props: IAcceptanceListToolbarProps) => {
   const classes = useToolbarStyles();
-  const { onClickRefresh, numSelected } = props;
+  const { onClickRefresh, date, numSelected } = props;
 
   /* TODO: 受付削除時のアクション */
   const deleteAcceptances = () => {
@@ -59,7 +65,7 @@ const AcceptanceListToolbar = (props: IAcceptanceListToolbarProps) => {
 
   /* TODO: 受付更新時のアクション */
   const refreshAcceptances = () => {
-    onClickRefresh();
+    onClickRefresh(date);
   };
 
   return (
@@ -92,7 +98,7 @@ const AcceptanceListToolbar = (props: IAcceptanceListToolbarProps) => {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title='Filter list'>
+        <Tooltip title='Refresh list'>
           <IconButton aria-label='refresh list' onClick={refreshAcceptances}>
             <RefreshIcon />
           </IconButton>
@@ -266,6 +272,9 @@ function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
 let changeStatus = {
   index: -1,
   acceptance_id: '',
+  acceptance_date: '',
+  acceptance_time: '',
+  patient_id: '',
   code: -1,
 };
 
@@ -277,6 +286,7 @@ const AcceptanceList = () => {
   const [selected, setSelected] = useState<string[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -349,16 +359,21 @@ const AcceptanceList = () => {
   const handleStatusClick = (
     event: MouseEvent<HTMLElement>,
     index: number,
-    acceptance_id: string
+    acceptance_id: string,
+    acceptance_date: string,
+    acceptance_time: string,
+    patient_id: string
   ) => {
     changeStatus.index = index;
     changeStatus.acceptance_id = acceptance_id;
+    changeStatus.acceptance_date = acceptance_date;
+    changeStatus.acceptance_time = acceptance_time;
+    changeStatus.patient_id = patient_id;
     // setChangeStatus({
     //   index: index,
     //   acceptance_id: acceptance_id,
     //   code: 0,
     // });
-    console.log('button click    : ', index, acceptance_id, changeStatus);
     setAnchorEl(event.currentTarget);
     event.stopPropagation();
   };
@@ -366,17 +381,31 @@ const AcceptanceList = () => {
   /* TODO: ステータス変更時のアクション */
   const handleClickItem = (event: MouseEvent<HTMLElement>, code: number) => {
     changeStatus.code = code;
-    // setChangeStatus({
-    //   ...changeStatus,
-    //   code: code,
-    // });
-    const data = tableData.filter((row) => {
-      if (row.Acceptance_ID === changeStatus.acceptance_id) {
+    tableData.filter((row) => {
+      if (
+        row.Acceptance_ID === changeStatus.acceptance_id &&
+        row.Patient_ID === changeStatus.patient_id &&
+        row.Acceptance_Time === changeStatus.acceptance_time
+      ) {
         row.Status = changeStatus.code.toString();
       }
       return true;
     });
-    setTableData(data);
+    if (changeStatus.code === 3) {
+      api
+        .cancelAcceptance(
+          api.date_to_string(selectedDate),
+          changeStatus.acceptance_id,
+          changeStatus.acceptance_time,
+          changeStatus.patient_id
+        )
+        .then((resp) => {
+          setTableData(resp.data);
+        })
+        .catch((err) => {
+          console.log('calcel error : ', err);
+        });
+    }
 
     handleClose(event);
   };
@@ -386,6 +415,9 @@ const AcceptanceList = () => {
     changeStatus = {
       index: -1,
       acceptance_id: '',
+      acceptance_date: '',
+      acceptance_time: '',
+      patient_id: '',
       code: -1,
     };
     // setChangeStatus({
@@ -396,16 +428,27 @@ const AcceptanceList = () => {
     event.stopPropagation();
   };
 
-  const sendReceipt = (event: MouseEvent<HTMLElement>) => {
-    alert('会計を送信しました。');
+  const sendReceipt = (event: MouseEvent<HTMLElement>, data: any) => {
+    console.log(data);
+    api
+      .sendReceipt(data)
+      .then((resp) => {
+        console.log('============receipt res data=============');
+        console.log(resp);
+        console.log('============receipt res data=============');
+        // const data: IAcceptance[] = resp.data;
+        // setTableData(data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     event.stopPropagation();
   };
 
-  const getAcceptancesData = () => {
+  const getAcceptancesData = (date: Date | null) => {
     api
-      .getAcceptances()
+      .getAcceptances(date)
       .then((resp) => {
-        console.log(resp);
         const data: IAcceptance[] = resp.data;
         setTableData(data);
       })
@@ -415,8 +458,12 @@ const AcceptanceList = () => {
   };
 
   useEffect(() => {
-    getAcceptancesData();
-  }, []);
+    getAcceptancesData(selectedDate);
+  }, [selectedDate]);
+
+  const handleDateChange = (date: MaterialUiPickersDate) => {
+    setSelectedDate(date);
+  };
 
   return (
     <div className={classes.root}>
@@ -424,7 +471,20 @@ const AcceptanceList = () => {
         <AcceptanceListToolbar
           onClickRefresh={getAcceptancesData}
           numSelected={selected.length}
+          date={selectedDate}
         />
+        <MuiPickersUtilsProvider utils={DateFnsUtils} locale={jaLocale}>
+          <DatePicker
+            disableToolbar
+            autoOk
+            disableFuture
+            variant='inline'
+            format='yyyy-MM-dd'
+            margin='normal'
+            onChange={handleDateChange}
+            value={selectedDate}
+          />
+        </MuiPickersUtilsProvider>
         <TableContainer className={classes.container}>
           <Table
             stickyHeader
@@ -445,7 +505,6 @@ const AcceptanceList = () => {
               {sortedData.map((row, rowIndex) => {
                 const isItemsSelected = isSelected(row.Acceptance_ID);
                 const labelId = `enhanced-table-checkbox-${rowIndex}`;
-                console.log(row);
                 return (
                   <StyledTableRow
                     hover
@@ -497,7 +556,14 @@ const AcceptanceList = () => {
                           width: '100px',
                         }}
                         onClick={(event) => {
-                          handleStatusClick(event, rowIndex, row.Acceptance_ID);
+                          handleStatusClick(
+                            event,
+                            rowIndex,
+                            row.Acceptance_ID,
+                            api.date_to_string(selectedDate),
+                            row.Acceptance_Time,
+                            row.Patient_ID
+                          );
                         }}
                       >
                         {Status[parseInt(row.Status)].title}▼
@@ -574,7 +640,7 @@ const AcceptanceList = () => {
                       align='center'
                       style={{ borderLeft: '1px solid gray' }}
                     >
-                      {row.Previouse_Acceptance_Date}
+                      {row.LastVisit_Date}
                     </TableCell>
                     <TableCell
                       align='center'
@@ -598,7 +664,7 @@ const AcceptanceList = () => {
                       <IconButton
                         color='secondary'
                         disabled={parseInt(row.Status) !== 1}
-                        onClick={sendReceipt}
+                        onClick={(event) => sendReceipt(event, row)}
                       >
                         <CreditCardIcon />
                       </IconButton>

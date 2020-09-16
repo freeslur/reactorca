@@ -328,65 +328,9 @@ const AcceptanceList = () => {
     page * rowsPerPage + rowsPerPage
   );
 
-  // const handleStatusClick = (
-  //   event: MouseEvent<HTMLElement>,
-  //   index: number,
-  //   acceptance_id: string
-  // ) => {
-  //   changeStatus.index = index;
-  //   changeStatus.acceptance_id = acceptance_id;
-  //   // setChangeStatus({
-  //   //   index: index,
-  //   //   acceptance_id: acceptance_id,
-  //   //   code: 0,
-  //   // });
-  //   console.log('button click    : ', index, acceptance_id, changeStatus);
-  //   setAnchorEl(event.currentTarget);
-  //   event.stopPropagation();
-  // };
-
-  // /* TODO: ステータス変更時のアクション */
-  // const handleClickItem = (event: MouseEvent<HTMLElement>, code: number) => {
-  //   changeStatus.code = code;
-  //   // setChangeStatus({
-  //   //   ...changeStatus,
-  //   //   code: code,
-  //   // });
-  //   const data = tableData.filter((row) => {
-  //     if (row.Acceptance_ID === changeStatus.acceptance_id) {
-  //       row.Status = changeStatus.code.toString();
-  //     }
-  //     return true;
-  //   });
-  //   setTableData(data);
-
-  //   handleClose(event);
-  // };
-
-  // const handleClose = (event: MouseEvent<HTMLElement>) => {
-  //   setAnchorEl(null);
-  //   changeStatus = {
-  //     index: -1,
-  //     acceptance_id: '',
-  //     code: -1,
-  //   };
-  //   // setChangeStatus({
-  //   //   index: -1,
-  //   //   acceptance_id: '',
-  //   //   code: -1,
-  //   // });
-  //   event.stopPropagation();
-  // };
-
-  // const sendReceipt = (event: MouseEvent<HTMLElement>) => {
-  //   alert('会計を送信しました。');
-  //   event.stopPropagation();
-  // };
-
   const getAcceptancesData = () => {
-    console.log('??????????????????????');
     api
-      .getAcceptances()
+      .getAcceptances(new Date())
       .then((resp) => {
         console.log('=============================');
         console.log(resp);

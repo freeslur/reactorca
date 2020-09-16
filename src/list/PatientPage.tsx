@@ -137,21 +137,6 @@ const PatientsPage = () => {
               console.log(rowData);
             }),
           onRowUpdate: (rowData) => new Promise(() => {}),
-          onRowDelete: (oldData) =>
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                resolve();
-                console.log('oldData:', oldData);
-                const deleteParams = { ...patient };
-                api.deletePatient(deleteParams).then((resp) => {
-                  console.log('deletePatient : ', resp);
-                });
-                // console.log('dataDelete', dataDelete);
-                // const index = oldData.id;
-                // // dataDelete.splice(index, 1);
-                // setPatient({ ...dataDelete });
-              }, 1000);
-            }),
         }}
       />
     </>

@@ -36,7 +36,6 @@ const AcceptanceStatusReducer = (
 ) => {
   switch (action.type) {
     case 'SET_STATUS': {
-      console.log(action.acceptance_id);
       return {
         index: action.index,
         acceptance_id: action.acceptance_id,
