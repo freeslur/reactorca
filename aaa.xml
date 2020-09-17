@@ -1,0 +1,78 @@
+<Medical_Information_child type="record">
+        <Medical_Class type="string">120</Medical_Class>
+        <Medical_Class_Name type="string">再診</Medical_Class_Name>
+        <Medical_Class_Number type="string">1</Medical_Class_Number>
+        <Medication_info type="array">
+                <Medication_info_child type="record">
+                        <Medication_Code type="string">112007410</Medication_Code>
+                        <Medication_Name type="string">再診</Medication_Name>
+                        <Medication_Number type="string">1</Medication_Number>
+                        <Medication_Generic_Flg type="string"></Medication_Generic_Flg>
+                </Medication_info_child>
+        </Medication_info>
+</Medical_Information_child>
+<Medical_Information_child type="record">
+        <Medical_Class type="string">210</Medical_Class>
+        <Medical_Class_Name type="string">内服薬剤</Medical_Class_Name>
+        <Medical_Class_Number type="string">1</Medical_Class_Number>
+        <Medication_info type="array">
+                <Medication_info_child type="record">
+                        <Medication_Code type="string">620001402</Medication_Code>
+                        <Medication_Name type="string">グリセリン</Medication_Name>
+                        <Medication_Number type="string">2</Medication_Number>
+                        <Medication_Generic_Flg type="string">yes</Medication_Generic_Flg>
+                </Medication_info_child>
+        </Medication_info>
+</Medical_Information_child>
+<Medical_Information_child type="record">
+        <Medical_Class type="string">500</Medical_Class>
+        <Medical_Class_Name type="string">手術</Medical_Class_Name>
+        <Medical_Class_Number type="string">1</Medical_Class_Number>
+        <Medication_info type="array">
+                <Medication_info_child type="record">
+                        <Medication_Code type="string">150003110</Medication_Code>
+                        <Medication_Name type="string">皮膚、皮下腫瘍摘出術（露出部）（長径２ｃｍ未満）</Medication_Name>
+                        <Medication_Number type="string">1</Medication_Number>
+                        <Medication_Generic_Flg type="string"></Medication_Generic_Flg>
+                </Medication_info_child>
+                <Medication_info_child type="record">
+                        <Medication_Code type="string">641210099</Medication_Code>
+                        <Medication_Name type="string">キシロカイン注射液１％</Medication_Name>
+                        <Medication_Number type="string">3</Medication_Number>
+                        <Medication_Generic_Flg type="string"></Medication_Generic_Flg>
+                </Medication_info_child>
+                <Medication_info_child type="record">
+                        <Medication_Code type="string">840000042</Medication_Code>
+                        <Medication_Name type="string">手術○日</Medication_Name>
+                        <Medication_Number type="string">15</Medication_Number>
+                        <Medication_Generic_Flg type="string"></Medication_Generic_Flg>
+                </Medication_info_child>
+        </Medication_info>
+</Medical_Information_child>
+
+
+
+
+<Disease_Information_child type="record">
+        <Disease_Code type="string">8830052</Disease_Code>
+        <Disease_Name type="string">ＡＣバイパス術後機械的合併症</Disease_Name>
+        <Disease_SuspectedFlag type="string">S</Disease_SuspectedFlag>
+        <Disease_StartDate type="string">2010-11-23</Disease_StartDate>
+        <Disease_EndDate type="string">2010-11-24</Disease_EndDate>
+        <Disease_OutCome type="string">D</Disease_OutCome>
+</Disease_Information_child>
+<Disease_Information_child type="record">
+        <Disease_InOut type="string">O</Disease_InOut>
+        <Disease_Single type="array">
+                <Disease_Single_child type="record">
+                        <Disease_Single_Code type="string">830417</Disease_Single_Code>
+                </Disease_Single_child>
+                <Disease_Single_child type="record">
+                        <Disease_Single_Code type="string">ZZZ8002</Disease_Single_Code>
+                        <Disease_Single_Name type="string">の疑い</Disease_Single_Name>
+                </Disease_Single_child>
+        </Disease_Single>
+        <Disease_StartDate type="string">2010-07-06</Disease_StartDate>
+        <Disease_EndDate type="string">2010-07-28</Disease_EndDate>
+        <Disease_OutCome type="string">D</Disease_OutCome>
+</Disease_Information_child>

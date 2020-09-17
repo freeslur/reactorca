@@ -4,6 +4,7 @@ export const Status = [
   { title: '診療待', color: 'DEEPSKYBLUE', textColor: 'black' },
   { title: '送信待', color: 'VIOLET', textColor: 'black' },
   { title: '送信済', color: 'LIME', textColor: 'black' },
+  { title: '会計済', color: 'GRAY', textColor: 'white' },
   { title: '取り消し', color: 'RED', textColor: 'white' },
 ];
 

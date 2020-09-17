@@ -6,7 +6,7 @@ import {
   Menu,
   MenuItem,
 } from '@material-ui/core';
-import { Status } from './AcceptanceData';
+import { Status } from './AcceptanceDataInterfaces';
 
 const StyledSelect = withStyles({
   paper: {

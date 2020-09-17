@@ -1,4 +1,10 @@
-import React, { useState, ChangeEvent, MouseEvent, useEffect } from 'react';
+import React, {
+  useState,
+  ChangeEvent,
+  MouseEvent,
+  useEffect,
+  // useReducer,
+} from 'react';
 import {
   TableContainer,
   Paper,
@@ -35,9 +41,10 @@ import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
 
-import { AcceptanceData as rowData, headCells, Status } from './AcceptanceData';
+import { AcceptanceData as rowData, headCells } from './AcceptanceData';
 import {
   Order,
+  Status,
   IAcceptanceListProps,
   IAcceptance,
   IAcceptanceListToolbarProps,
@@ -278,7 +285,50 @@ let changeStatus = {
   code: -1,
 };
 
+//
+//
+//
+
+// type StatusType = {
+//   index: number;
+//   acceptance_id: string;
+//   acceptance_date: string;
+//   acceptance_time: string;
+//   patient_id: string;
+//   code: number;
+// };
+
+// const initStatus = {
+//   index: -1,
+//   acceptance_id: '',
+//   acceptance_date: '',
+//   acceptance_time: '',
+//   patient_id: '',
+//   code: -1,
+// };
+
+// type StatusAction = { type: 'CHANGE'; code: number } | { type: 'INITIALIZE' };
+
+// const reducer = (state: StatusType, action: StatusAction): StatusType => {
+//   switch (action.type) {
+//     case 'CHANGE':
+//       return { ...state, code: action.code };
+//     case 'INITIALIZE':
+//       return initStatus;
+//     default:
+//       throw new Error('Reducer Error!!!');
+//   }
+// };
+
 const AcceptanceList = () => {
+  // const [count, dispatch] = useReducer(reducer, initStatus);
+  // const onChangeStatus = () => dispatch({ type: 'CHANGE', code: 1 });
+  //
+  //
+  //
+  //
+  //
+
   const classes = useDefaultListStyles();
   const [tableData, setTableData] = useState(rowData);
   const [order, setOrder] = useState<Order>('asc');
@@ -289,12 +339,6 @@ const AcceptanceList = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
-  // const [changeStatus, setChangeStatus] = useState({
-  //   index: -1,
-  //   acceptance_id: '',
-  //   code: -1,
-  // });
 
   const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -429,6 +473,7 @@ const AcceptanceList = () => {
   };
 
   const sendReceipt = (event: MouseEvent<HTMLElement>, data: any) => {
+    console.log('============receipt req data=============');
     console.log(data);
     api
       .sendReceipt(data)
