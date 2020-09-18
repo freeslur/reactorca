@@ -49,7 +49,6 @@ export interface IAcceptanceListProps {
 
 export interface IAcceptanceListToolbarProps {
   onClickRefresh: (date: Date | null) => void;
-  date: Date | null;
   numSelected: number;
 }
 

@@ -59,10 +59,15 @@ import {
 import { TablePaginationActionsProps } from '@material-ui/core/TablePagination/TablePaginationActions';
 import * as api from '../../api/Acceptance';
 import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
+import {
+  // AccDateContextConsumer,
+  useAccDateContext,
+} from '../../contexts/AccContext';
 
 const AcceptanceListToolbar = (props: IAcceptanceListToolbarProps) => {
   const classes = useToolbarStyles();
-  const { onClickRefresh, date, numSelected } = props;
+  const accDate = useAccDateContext();
+  const { onClickRefresh, numSelected } = props;
 
   /* TODO: 受付削除時のアクション */
   const deleteAcceptances = () => {
@@ -72,7 +77,7 @@ const AcceptanceListToolbar = (props: IAcceptanceListToolbarProps) => {
 
   /* TODO: 受付更新時のアクション */
   const refreshAcceptances = () => {
-    onClickRefresh(date);
+    onClickRefresh(accDate.state.selDate);
   };
 
   return (
@@ -330,13 +335,14 @@ const AcceptanceList = () => {
   //
 
   const classes = useDefaultListStyles();
+  const accDate = useAccDateContext();
   const [tableData, setTableData] = useState(rowData);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof IAcceptance>('Acceptance_ID');
   const [selected, setSelected] = useState<string[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
+  // const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -438,7 +444,7 @@ const AcceptanceList = () => {
     if (changeStatus.code === 3) {
       api
         .cancelAcceptance(
-          api.date_to_string(selectedDate),
+          api.date_to_string(accDate.state.selDate),
           changeStatus.acceptance_id,
           changeStatus.acceptance_time,
           changeStatus.patient_id
@@ -503,20 +509,21 @@ const AcceptanceList = () => {
   };
 
   useEffect(() => {
-    getAcceptancesData(selectedDate);
-  }, [selectedDate]);
+    getAcceptancesData(accDate.state.selDate);
+  }, [accDate.state.selDate]);
 
   const handleDateChange = (date: MaterialUiPickersDate) => {
-    setSelectedDate(date);
+    if (date !== null) accDate.actions.setSelDate(date);
   };
 
   return (
+    // <AccDateContextConsumer>
+    //   {(value) => (
     <div className={classes.root}>
       <Paper className={classes.paper}>
         <AcceptanceListToolbar
           onClickRefresh={getAcceptancesData}
           numSelected={selected.length}
-          date={selectedDate}
         />
         <MuiPickersUtilsProvider utils={DateFnsUtils} locale={jaLocale}>
           <DatePicker
@@ -527,7 +534,7 @@ const AcceptanceList = () => {
             format='yyyy-MM-dd'
             margin='normal'
             onChange={handleDateChange}
-            value={selectedDate}
+            value={accDate.state.selDate}
           />
         </MuiPickersUtilsProvider>
         <TableContainer className={classes.container}>
@@ -605,7 +612,7 @@ const AcceptanceList = () => {
                             event,
                             rowIndex,
                             row.Acceptance_ID,
-                            api.date_to_string(selectedDate),
+                            api.date_to_string(accDate.state.selDate),
                             row.Acceptance_Time,
                             row.Patient_ID
                           );
@@ -744,6 +751,8 @@ const AcceptanceList = () => {
         />
       </Paper>
     </div>
+    //   )}
+    // </AccDateContextConsumer>
   );
 };
 
