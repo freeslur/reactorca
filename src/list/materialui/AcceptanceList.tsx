@@ -26,6 +26,13 @@ import {
   MenuItem,
   Button,
   MenuProps,
+  Modal,
+  makeStyles,
+  Theme,
+  createStyles,
+  Backdrop,
+  TextField,
+  InputAdornment,
 } from '@material-ui/core';
 
 import 'date-fns';
@@ -40,6 +47,9 @@ import LastPageIcon from '@material-ui/icons/LastPage';
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
+import PeopleIcon from '@material-ui/icons/People';
+import SearchIcon from '@material-ui/icons/Search';
+import AccountCircle from '@material-ui/icons/AccountCircle';
 
 import { AcceptanceData as rowData, headCells } from './AcceptanceData';
 import {
@@ -58,16 +68,46 @@ import {
 } from './AcceptanceListStyles';
 import { TablePaginationActionsProps } from '@material-ui/core/TablePagination/TablePaginationActions';
 import * as api from '../../api/Acceptance';
+import * as papi from '../../api/Patient';
 import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 import {
   // AccDateContextConsumer,
   useAccDateContext,
 } from '../../contexts/AccContext';
+import Fade from '@material-ui/core/Fade';
+
+const useModalStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    modal: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    paper: {
+      backgroundColor: theme.palette.background.paper,
+      border: '2px solid #000',
+      maxWidth: '700px',
+      boxShadow: theme.shadows[5],
+      padding: theme.spacing(2, 4, 3),
+    },
+    data: {
+      fontSize: '12px',
+      wordWrap: 'break-word',
+    },
+    inputText: {
+      margin: theme.spacing(1),
+    },
+  })
+);
 
 const AcceptanceListToolbar = (props: IAcceptanceListToolbarProps) => {
   const classes = useToolbarStyles();
+  const modalClasses = useModalStyles();
   const accDate = useAccDateContext();
   const { onClickRefresh, numSelected } = props;
+  const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
+  const [pData, setPData] = useState<{} | null>(null);
 
   /* TODO: 受付削除時のアクション */
   const deleteAcceptances = () => {
@@ -78,6 +118,30 @@ const AcceptanceListToolbar = (props: IAcceptanceListToolbarProps) => {
   /* TODO: 受付更新時のアクション */
   const refreshAcceptances = () => {
     onClickRefresh(accDate.state.selDate);
+  };
+
+  const handlePatientsList = () => {
+    setOpen(true);
+  };
+  const handlePatientsListClose = () => {
+    setPData(null);
+    setOpen(false);
+  };
+
+  const handleSearchPatient = () => {
+    papi
+      .getPatient(searchValue)
+      .then((resp) => {
+        const data = resp.data;
+        if (data['Api_Result'] === '00') {
+          setPData(data['Patient_Information']);
+        } else {
+          setPData(null);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -103,6 +167,52 @@ const AcceptanceListToolbar = (props: IAcceptanceListToolbarProps) => {
           受付リスト
         </Typography>
       )}
+      <Tooltip title='Patients'>
+        <IconButton aria-label='patients' onClick={handlePatientsList}>
+          <PeopleIcon />
+        </IconButton>
+      </Tooltip>
+      <Modal
+        aria-labelledby='patients list'
+        aria-describedby='patients list description'
+        className={modalClasses.modal}
+        open={open}
+        onClose={handlePatientsListClose}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{ timeout: 500 }}
+      >
+        <Fade in={open}>
+          <div className={modalClasses.paper}>
+            <TextField
+              className={modalClasses.inputText}
+              id='input-with-icon-search'
+              label='患者IDまたは患者名カナ'
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>
+                    <AccountCircle />
+                  </InputAdornment>
+                ),
+              }}
+              onChange={(event) => {
+                setSearchValue(event.target.value);
+              }}
+            />
+            <IconButton aria-label='search' onClick={handleSearchPatient}>
+              <SearchIcon />
+            </IconButton>
+            {console.log(pData)}
+            {pData !== null ? (
+              <div className={modalClasses.data}>
+                {JSON.stringify(pData, null, '\t')}
+              </div>
+            ) : (
+              <div>データが存在しません。</div>
+            )}
+          </div>
+        </Fade>
+      </Modal>
       {numSelected > 0 ? (
         <Tooltip title='Delete'>
           <IconButton aria-label='delete' onClick={deleteAcceptances}>

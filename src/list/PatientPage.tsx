@@ -71,9 +71,9 @@ const PatientsPage = () => {
   ];
   useEffect(() => {
     api
-      .getPatients()
+      .getPatient('')
       .then((resp) => {
-        const data: IPatient = {
+        const data = {
           Patient_ID: resp.data.Patient_ID,
           WholeName: resp.data.WholeName,
           WholeName_inKana: resp.data.WholeName_inKana,
