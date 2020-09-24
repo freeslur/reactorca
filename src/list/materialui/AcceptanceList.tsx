@@ -75,6 +75,7 @@ import {
   useAccDateContext,
 } from '../../contexts/AccContext';
 import Fade from '@material-ui/core/Fade';
+import io from 'socket.io-client';
 
 const useModalStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -187,7 +188,7 @@ const AcceptanceListToolbar = (props: IAcceptanceListToolbarProps) => {
             <TextField
               className={modalClasses.inputText}
               id='input-with-icon-search'
-              label='患者IDまたは患者名カナ'
+              label='患者ID'
               InputProps={{
                 startAdornment: (
                   <InputAdornment position='start'>
@@ -456,6 +457,23 @@ const AcceptanceList = () => {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
+  //
+  //
+  const socket = io('http://192.168.8.84:5000/accsocket');
+  // const sendMessage = (event) => {
+  //   event.preventDefault();
+  //   socket.emit('SEND_MSG', { data: 'data' });
+  // };
+
+  socket.on('accres', function (data: any) {
+    console.log('socket data: ', data);
+  });
+
+  socket.emit('acc_new', { data: 'data2' });
+
+  //
+  //
+
   const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       const newSelecteds = tableData.map((n) => n.Acceptance_ID);
@@ -624,6 +642,12 @@ const AcceptanceList = () => {
 
   const handleDateChange = (date: MaterialUiPickersDate) => {
     if (date !== null) accDate.actions.setSelDate(date);
+  };
+
+  const handleSetServerAccDate = (date: Date) => {
+    api.setAccDate(date.toString()).then((resp) => {
+      console.log(resp);
+    });
   };
 
   return (

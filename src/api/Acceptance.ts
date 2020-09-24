@@ -35,6 +35,10 @@ export const cancelAcceptance = (
   });
 };
 
+export const setAccDate = (acc_date: string) => {
+  return client.post('/acc_date/' + acc_date);
+};
+
 export const sendReceipt = (data: any) => {
   const u_time = Date.parse(
     data['Acceptance_Date'] + 'T' + data['Acceptance_Time']
