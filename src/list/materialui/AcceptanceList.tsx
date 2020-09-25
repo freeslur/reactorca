@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  ChangeEvent,
-  MouseEvent,
-  useEffect,
-  // useReducer,
-} from 'react';
+import React, { useState, ChangeEvent, MouseEvent, useEffect } from 'react';
 import {
   TableContainer,
   Paper,
@@ -12,13 +6,7 @@ import {
   TableBody,
   Table,
   TableCell,
-  Toolbar,
-  Typography,
-  Tooltip,
   IconButton,
-  TableHead,
-  Checkbox,
-  TableSortLabel,
   TablePagination,
   useTheme,
   withStyles,
@@ -26,210 +14,38 @@ import {
   MenuItem,
   Button,
   MenuProps,
-  Modal,
-  makeStyles,
-  Theme,
-  createStyles,
-  Backdrop,
-  TextField,
-  InputAdornment,
 } from '@material-ui/core';
 
 import 'date-fns';
 import jaLocale from 'date-fns/locale/ja';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
-import clsx from 'clsx';
-import DeleteIcon from '@material-ui/icons/Delete';
-import RefreshIcon from '@material-ui/icons/Refresh';
 import FirstPageIcon from '@material-ui/icons/FirstPage';
 import LastPageIcon from '@material-ui/icons/LastPage';
 import KeyboardArrowLeftIcon from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@material-ui/icons/KeyboardArrowRight';
 import CreditCardIcon from '@material-ui/icons/CreditCard';
-import PeopleIcon from '@material-ui/icons/People';
-import SearchIcon from '@material-ui/icons/Search';
-import AccountCircle from '@material-ui/icons/AccountCircle';
 
-import { AcceptanceData as rowData, headCells } from './AcceptanceData';
+import { AcceptanceData as rowData } from './AcceptanceData';
+import { Status, IAcceptance } from './AcceptanceDataInterfaces';
 import {
-  Order,
-  Status,
-  IAcceptanceListProps,
-  IAcceptance,
-  IAcceptanceListToolbarProps,
-} from './AcceptanceDataInterfaces';
-import {
-  StyledTableCell,
-  useToolbarStyles,
   useTablePaginationStyles,
   useDefaultListStyles,
   StyledTableRow,
 } from './AcceptanceListStyles';
 import { TablePaginationActionsProps } from '@material-ui/core/TablePagination/TablePaginationActions';
 import * as api from '../../api/Acceptance';
-import * as papi from '../../api/Patient';
 import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
-import {
-  // AccDateContextConsumer,
-  useAccDateContext,
-} from '../../contexts/AccContext';
-import Fade from '@material-ui/core/Fade';
+import { useAccContext } from '../../contexts/AccContext';
 import io from 'socket.io-client';
-
-const useModalStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    modal: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    paper: {
-      backgroundColor: theme.palette.background.paper,
-      border: '2px solid #000',
-      maxWidth: '700px',
-      boxShadow: theme.shadows[5],
-      padding: theme.spacing(2, 4, 3),
-    },
-    data: {
-      fontSize: '12px',
-      wordWrap: 'break-word',
-    },
-    inputText: {
-      margin: theme.spacing(1),
-    },
-  })
-);
-
-const AcceptanceListToolbar = (props: IAcceptanceListToolbarProps) => {
-  const classes = useToolbarStyles();
-  const modalClasses = useModalStyles();
-  const accDate = useAccDateContext();
-  const { onClickRefresh, numSelected } = props;
-  const [open, setOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
-  const [pData, setPData] = useState<{} | null>(null);
-
-  /* TODO: 受付削除時のアクション */
-  const deleteAcceptances = () => {
-    console.log('Delete!!!!!');
-    alert('Delete!!');
-  };
-
-  /* TODO: 受付更新時のアクション */
-  const refreshAcceptances = () => {
-    onClickRefresh(accDate.state.selDate);
-  };
-
-  const handlePatientsList = () => {
-    setOpen(true);
-  };
-  const handlePatientsListClose = () => {
-    setPData(null);
-    setOpen(false);
-  };
-
-  const handleSearchPatient = () => {
-    papi
-      .getPatient(searchValue)
-      .then((resp) => {
-        const data = resp.data;
-        if (data['Api_Result'] === '00') {
-          setPData(data['Patient_Information']);
-        } else {
-          setPData(null);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
-  return (
-    <Toolbar
-      className={clsx(classes.root, { [classes.highlight]: numSelected > 0 })}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          className={classes.title}
-          color='inherit'
-          variant='subtitle1'
-          component='div'
-        >
-          {numSelected}個選択
-        </Typography>
-      ) : (
-        <Typography
-          className={classes.title}
-          variant='h6'
-          id='tableTitle'
-          component='div'
-        >
-          受付リスト
-        </Typography>
-      )}
-      <Tooltip title='Patients'>
-        <IconButton aria-label='patients' onClick={handlePatientsList}>
-          <PeopleIcon />
-        </IconButton>
-      </Tooltip>
-      <Modal
-        aria-labelledby='patients list'
-        aria-describedby='patients list description'
-        className={modalClasses.modal}
-        open={open}
-        onClose={handlePatientsListClose}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{ timeout: 500 }}
-      >
-        <Fade in={open}>
-          <div className={modalClasses.paper}>
-            <TextField
-              className={modalClasses.inputText}
-              id='input-with-icon-search'
-              label='患者ID'
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position='start'>
-                    <AccountCircle />
-                  </InputAdornment>
-                ),
-              }}
-              onChange={(event) => {
-                setSearchValue(event.target.value);
-              }}
-            />
-            <IconButton aria-label='search' onClick={handleSearchPatient}>
-              <SearchIcon />
-            </IconButton>
-            {console.log(pData)}
-            {pData !== null ? (
-              <div className={modalClasses.data}>
-                {JSON.stringify(pData, null, '\t')}
-              </div>
-            ) : (
-              <div>データが存在しません。</div>
-            )}
-          </div>
-        </Fade>
-      </Modal>
-      {numSelected > 0 ? (
-        <Tooltip title='Delete'>
-          <IconButton aria-label='delete' onClick={deleteAcceptances}>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title='Refresh list'>
-          <IconButton aria-label='refresh list' onClick={refreshAcceptances}>
-            <RefreshIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Toolbar>
-  );
-};
+import AcceptanceListToolbar from './AcceptanceListToolbar';
+import AcceptanceListHead from './AcceptanceListHead';
+import {
+  date_to_string,
+  getComparator,
+  Order,
+  stableSort,
+} from '../../utils/utils';
 
 const TablePaginationActions = (props: TablePaginationActionsProps) => {
   const classes = useTablePaginationStyles();
@@ -293,186 +109,29 @@ const TablePaginationActions = (props: TablePaginationActionsProps) => {
   );
 };
 
-const AcceptanceListHead = (props: IAcceptanceListProps) => {
-  const {
-    classes,
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props;
-  const createSortHandler = (property: keyof IAcceptance) => (
-    event: MouseEvent<unknown>
-  ) => {
-    onRequestSort(event, property);
-  };
-  return (
-    <TableHead>
-      <TableRow>
-        <StyledTableCell
-          padding='checkbox'
-          style={{ borderLeft: '1px solid gray', borderTop: '1px solid gray' }}
-        >
-          <Checkbox
-            indeterminate={numSelected > 0 && numSelected < rowCount}
-            checked={rowCount > 0 && numSelected === rowCount}
-            onChange={onSelectAllClick}
-            inputProps={{ 'aria-label': 'select all desserts' }}
-          />
-        </StyledTableCell>
-        {headCells.map((headCell) => (
-          <StyledTableCell
-            key={headCell.id}
-            align='center'
-            padding='none'
-            sortDirection={orderBy === headCell.id ? order : false}
-            style={{
-              borderLeft: '1px solid gray',
-              borderTop: '1px solid gray',
-            }}
-          >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
-            >
-              {headCell.label}
-              {orderBy === headCell.id ? (
-                <span className={classes.visuallyHidden}>
-                  {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                </span>
-              ) : null}
-            </TableSortLabel>
-          </StyledTableCell>
-        ))}
-        <StyledTableCell
-          style={{
-            borderLeft: '1px solid gray',
-            borderTop: '1px solid gray',
-            borderRight: '1px solid gray',
-          }}
-        >
-          会計
-        </StyledTableCell>
-      </TableRow>
-    </TableHead>
-  );
-};
-
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key
-): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string }
-) => number {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function stableSort<T>(array: T[], comparator: (a: T, b: T) => number) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
-let changeStatus = {
-  index: -1,
-  acceptance_id: '',
-  acceptance_date: '',
-  acceptance_time: '',
-  patient_id: '',
-  code: -1,
-};
-
-//
-//
-//
-
-// type StatusType = {
-//   index: number;
-//   acceptance_id: string;
-//   acceptance_date: string;
-//   acceptance_time: string;
-//   patient_id: string;
-//   code: number;
-// };
-
-// const initStatus = {
-//   index: -1,
-//   acceptance_id: '',
-//   acceptance_date: '',
-//   acceptance_time: '',
-//   patient_id: '',
-//   code: -1,
-// };
-
-// type StatusAction = { type: 'CHANGE'; code: number } | { type: 'INITIALIZE' };
-
-// const reducer = (state: StatusType, action: StatusAction): StatusType => {
-//   switch (action.type) {
-//     case 'CHANGE':
-//       return { ...state, code: action.code };
-//     case 'INITIALIZE':
-//       return initStatus;
-//     default:
-//       throw new Error('Reducer Error!!!');
-//   }
-// };
-
 const AcceptanceList = () => {
-  // const [count, dispatch] = useReducer(reducer, initStatus);
-  // const onChangeStatus = () => dispatch({ type: 'CHANGE', code: 1 });
-  //
-  //
-  //
-  //
-  //
-
   const classes = useDefaultListStyles();
-  const accDate = useAccDateContext();
+  const accContext = useAccContext();
   const [tableData, setTableData] = useState(rowData);
   const [order, setOrder] = useState<Order>('asc');
   const [orderBy, setOrderBy] = useState<keyof IAcceptance>('Acceptance_ID');
   const [selected, setSelected] = useState<string[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  // const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   //
   //
-  const socket = io('http://192.168.8.84:5000/accsocket');
-  // const sendMessage = (event) => {
-  //   event.preventDefault();
-  //   socket.emit('SEND_MSG', { data: 'data' });
-  // };
+  useEffect(() => {
+    const socket = io('http://127.0.0.1:5000/accsocket');
 
-  socket.on('accres', function (data: any) {
-    console.log('socket data: ', data);
-  });
-
-  socket.emit('acc_new', { data: 'data2' });
-
-  //
-  //
+    socket.on('accres', function (data: any) {
+      if (data['status'] === 'push') {
+        setTableData(data['data']);
+      }
+    });
+  }, []);
 
   const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -542,40 +201,44 @@ const AcceptanceList = () => {
     acceptance_time: string,
     patient_id: string
   ) => {
-    changeStatus.index = index;
-    changeStatus.acceptance_id = acceptance_id;
-    changeStatus.acceptance_date = acceptance_date;
-    changeStatus.acceptance_time = acceptance_time;
-    changeStatus.patient_id = patient_id;
-    // setChangeStatus({
-    //   index: index,
-    //   acceptance_id: acceptance_id,
-    //   code: 0,
-    // });
+    accContext.state.changeStatus = {
+      index: index,
+      acc_id: acceptance_id,
+      acc_date: acceptance_date,
+      acc_time: acceptance_time,
+      pati_id: patient_id,
+    };
     setAnchorEl(event.currentTarget);
     event.stopPropagation();
   };
 
   /* TODO: ステータス変更時のアクション */
   const handleClickItem = (event: MouseEvent<HTMLElement>, code: number) => {
-    changeStatus.code = code;
+    accContext.state.changeStatus.code = code;
     tableData.filter((row) => {
       if (
-        row.Acceptance_ID === changeStatus.acceptance_id &&
-        row.Patient_ID === changeStatus.patient_id &&
-        row.Acceptance_Time === changeStatus.acceptance_time
+        row.Acceptance_ID === accContext.state.changeStatus.acc_id &&
+        row.Patient_ID === accContext.state.changeStatus.pati_id &&
+        row.Acceptance_Time === accContext.state.changeStatus.acc_time
       ) {
-        row.Status = changeStatus.code.toString();
+        if (accContext.state.changeStatus.code !== undefined) {
+          row.Status = accContext.state.changeStatus.code.toString();
+        }
       }
       return true;
     });
-    if (changeStatus.code === 3) {
+    if (
+      accContext.state.changeStatus.code === 3 &&
+      accContext.state.changeStatus.acc_id !== undefined &&
+      accContext.state.changeStatus.acc_time !== undefined &&
+      accContext.state.changeStatus.pati_id !== undefined
+    ) {
       api
         .cancelAcceptance(
-          api.date_to_string(accDate.state.selDate),
-          changeStatus.acceptance_id,
-          changeStatus.acceptance_time,
-          changeStatus.patient_id
+          date_to_string(accContext.state.selDate),
+          accContext.state.changeStatus.acc_id,
+          accContext.state.changeStatus.acc_time,
+          accContext.state.changeStatus.pati_id
         )
         .then((resp) => {
           setTableData(resp.data);
@@ -590,19 +253,14 @@ const AcceptanceList = () => {
 
   const handleClose = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(null);
-    changeStatus = {
+    accContext.state.changeStatus = {
       index: -1,
-      acceptance_id: '',
-      acceptance_date: '',
-      acceptance_time: '',
-      patient_id: '',
+      acc_id: '',
+      acc_date: '',
+      acc_time: '',
+      pati_id: '',
       code: -1,
     };
-    // setChangeStatus({
-    //   index: -1,
-    //   acceptance_id: '',
-    //   code: -1,
-    // });
     event.stopPropagation();
   };
 
@@ -629,6 +287,7 @@ const AcceptanceList = () => {
       .getAcceptances(date)
       .then((resp) => {
         const data: IAcceptance[] = resp.data;
+        console.log(data);
         setTableData(data);
       })
       .catch((err) => {
@@ -637,22 +296,14 @@ const AcceptanceList = () => {
   };
 
   useEffect(() => {
-    getAcceptancesData(accDate.state.selDate);
-  }, [accDate.state.selDate]);
+    getAcceptancesData(accContext.state.selDate);
+  }, [accContext.state.selDate]);
 
   const handleDateChange = (date: MaterialUiPickersDate) => {
-    if (date !== null) accDate.actions.setSelDate(date);
-  };
-
-  const handleSetServerAccDate = (date: Date) => {
-    api.setAccDate(date.toString()).then((resp) => {
-      console.log(resp);
-    });
+    if (date !== null) accContext.actions.setSelDate(date);
   };
 
   return (
-    // <AccDateContextConsumer>
-    //   {(value) => (
     <div className={classes.root}>
       <Paper className={classes.paper}>
         <AcceptanceListToolbar
@@ -668,7 +319,7 @@ const AcceptanceList = () => {
             format='yyyy-MM-dd'
             margin='normal'
             onChange={handleDateChange}
-            value={accDate.state.selDate}
+            value={accContext.state.selDate}
           />
         </MuiPickersUtilsProvider>
         <TableContainer className={classes.container}>
@@ -694,23 +345,12 @@ const AcceptanceList = () => {
                 return (
                   <StyledTableRow
                     hover
-                    role='checkbox'
                     aria-checked={isItemsSelected}
                     tabIndex={-1}
                     key={row.Acceptance_ID}
                     selected={isItemsSelected}
                     onClick={(event) => handleClick(event, row.Acceptance_ID)}
                   >
-                    <TableCell
-                      padding='checkbox'
-                      style={{ borderLeft: '1px solid gray' }}
-                    >
-                      <Checkbox
-                        checked={isItemsSelected}
-                        inputProps={{ 'aria-labelledby': labelId }}
-                      />
-                    </TableCell>
-
                     <TableCell
                       component='th'
                       id={labelId}
@@ -746,7 +386,7 @@ const AcceptanceList = () => {
                             event,
                             rowIndex,
                             row.Acceptance_ID,
-                            api.date_to_string(accDate.state.selDate),
+                            date_to_string(accContext.state.selDate),
                             row.Acceptance_Time,
                             row.Patient_ID
                           );
@@ -885,8 +525,6 @@ const AcceptanceList = () => {
         />
       </Paper>
     </div>
-    //   )}
-    // </AccDateContextConsumer>
   );
 };
 

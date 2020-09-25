@@ -89,3 +89,27 @@ export const useTablePaginationStyles = makeStyles((theme: Theme) =>
     },
   })
 );
+
+export const useModalStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    modal: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    paper: {
+      backgroundColor: theme.palette.background.paper,
+      border: '2px solid #000',
+      maxWidth: '700px',
+      boxShadow: theme.shadows[5],
+      padding: theme.spacing(2, 4, 3),
+    },
+    data: {
+      fontSize: '12px',
+      wordWrap: 'break-word',
+    },
+    inputText: {
+      margin: theme.spacing(1),
+    },
+  })
+);

@@ -1,7 +1,6 @@
 import { MouseEvent, ChangeEvent } from 'react';
+import { Order } from '../../utils/utils';
 import { useDefaultListStyles } from './AcceptanceListStyles';
-
-export type Order = 'asc' | 'desc';
 
 export const Status = [
   { title: '診療待', color: 'DEEPSKYBLUE', textColor: 'black' },

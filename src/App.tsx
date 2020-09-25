@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { AccDateContextProvider } from './contexts/AccContext';
+import { AccContextProvider } from './contexts/AccContext';
 // import PatientsPage from './list/PatientPage';
 import AcceptanceList from './list/materialui/AcceptanceList';
 
@@ -13,9 +13,9 @@ class App extends Component {
           // onStatusChange={this.onStatusChange}
           // isLoading={this.props.isLoading}
           /> */}
-        <AccDateContextProvider>
+        <AccContextProvider>
           <AcceptanceList />
-        </AccDateContextProvider>
+        </AccContextProvider>
       </>
     );
   }

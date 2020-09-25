@@ -1,19 +1,8 @@
 import { axios_base } from '../api/DefaultCRUD';
+import { date_to_string } from '../utils/utils';
 
 // axios.defaults.withCredentials = true;
 const client = axios_base();
-
-const double_digit = (arg: number) => {
-  return arg < 10 ? '0' + arg.toString() : arg.toString();
-};
-
-export const date_to_string = (date: Date | null) => {
-  if (date === null) return '';
-  const yyyy = date.getFullYear().toString();
-  const MM = double_digit(date.getMonth() + 1);
-  const dd = double_digit(date.getDate());
-  return yyyy + '-' + MM + '-' + dd;
-};
 
 export const getAcceptances = (acc_date: Date | null) => {
   return client.post('/acceptances', {
