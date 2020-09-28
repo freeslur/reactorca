@@ -228,7 +228,7 @@ const AcceptanceList = () => {
       return true;
     });
     if (
-      accContext.state.changeStatus.code === 3 &&
+      accContext.state.changeStatus.code === 4 &&
       accContext.state.changeStatus.acc_id !== undefined &&
       accContext.state.changeStatus.acc_time !== undefined &&
       accContext.state.changeStatus.pati_id !== undefined
