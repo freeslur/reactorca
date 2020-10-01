@@ -240,9 +240,6 @@ const AcceptanceList = () => {
           accContext.state.changeStatus.acc_time,
           accContext.state.changeStatus.pati_id
         )
-        .then((resp) => {
-          setTableData(resp.data);
-        })
         .catch((err) => {
           console.log('calcel error : ', err);
         });
@@ -265,20 +262,9 @@ const AcceptanceList = () => {
   };
 
   const sendReceipt = (event: MouseEvent<HTMLElement>, data: any) => {
-    console.log('============receipt req data=============');
-    console.log(data);
-    api
-      .sendReceipt(data)
-      .then((resp) => {
-        console.log('============receipt res data=============');
-        console.log(resp);
-        console.log('============receipt res data=============');
-        // const data: IAcceptance[] = resp.data;
-        // setTableData(data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    api.sendReceipt(data).catch((err) => {
+      console.log(err);
+    });
     event.stopPropagation();
   };
 
@@ -287,7 +273,6 @@ const AcceptanceList = () => {
       .getAcceptances(date)
       .then((resp) => {
         const data: IAcceptance[] = resp.data;
-        console.log(data);
         setTableData(data);
       })
       .catch((err) => {
