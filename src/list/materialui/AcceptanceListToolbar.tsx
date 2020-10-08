@@ -64,9 +64,18 @@ const AcceptanceListToolbar = (props: IAcceptanceListToolbarProps) => {
   };
 
   const handleAccountTest = (event: MouseEvent<HTMLElement>) => {
-    api.sendReceiptTest().catch((err) => {
-      console.log(err);
-    });
+    api
+      .sendReceiptTest()
+      .then((resp) => {
+        const data = resp.data;
+        console.log('aaa', data);
+        if (data['error'] !== '00') {
+          alert(data['error']);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     event.stopPropagation();
   };
 

@@ -1,0 +1,23 @@
+{
+  "data": {
+    "Information_Date": "2020-10-08",
+    "Information_Time": "12:12:52",
+    "Api_Result": "90",
+    "Api_Result_Message": "他端末使用中",
+    "Reskey": "Medical Info",
+    "Perform_Date": "2020-10-08",
+    "Perform_Time": "13:12",
+    "Department_Code": "01",
+    "Department_Name": "内科",
+    "Physician_Code": "10005",
+    "Physician_WholeName": "整形外科\u3000四郎",
+    "Patient_Information": {
+      "Patient_ID": "00003",
+      "WholeName": "事例\u3000三",
+      "WholeName_inKana": "ジレイ\u3000サン",
+      "BirthDate": "1965-08-10",
+      "Sex": "2"
+    }
+  },
+  "error": "90 : 他端末使用中"
+}
